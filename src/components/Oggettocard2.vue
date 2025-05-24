@@ -61,8 +61,8 @@ const formatPrice = (price) => {
       </div>
       
       <div v-if="showAttributes" class="attributes">
-        <div v-for="attr in attributes" :key="attr.nome" class="attribute">
-          <strong>{{ attr.nome }}:</strong> {{ attr.valore }}
+        <div v-for="attr in attributes" :key="attr.nomeAttributo" class="attribute">
+          <strong>{{ attr.nomeAttributo }}:</strong> {{ attr.valore }}
         </div>
       </div>
       

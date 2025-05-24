@@ -3,8 +3,11 @@ import { onMounted, ref } from 'vue';
 import CategoriaHome from '@/components/CategoriaHome.vue';
 import Oggetto from '@/components/Oggettocard2.vue'; // Assicurati che punti al componente corretto
 import { fetchOggettiRandom } from '@/services/oggetti2.js';
+import { useRouter } from 'vue-router';
 
 const oggetti = ref([]);
+const router = useRouter();
+
 
 const formatBase64 = (base64) => {
   if (!base64) return '/placeholder.jpg';
@@ -37,6 +40,11 @@ onMounted(async () => {
     oggetti.value = [];
   }
 });
+
+function vaiANuovoOggetto() {
+  router.push('/nuovo-oggetto');
+}
+
 </script>
 
 <template>
@@ -46,7 +54,7 @@ onMounted(async () => {
         <div class="hero-content">
           <h2>Noleggia gli oggetti che non utilizzi</h2>
           <p>è arrivato il momento di liberare la casa!</p>
-          <button class="cta-btn">Metti a Noleggia subito</button>
+          <button class="cta-btn" @click="vaiANuovoOggetto">Metti a Noleggio subito</button>
         </div>
       </div>
     </section>

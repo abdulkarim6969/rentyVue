@@ -7,6 +7,8 @@ import ProfiloUtente from '@/components/ProfiloUtente.vue';
 import OggettiPreferiti from '@/components/OggettiPreferiti.vue';
 import Noleggi from '@/components/Noleggi.vue';
 import CercaOggetti from '@/components/CercaOggetti.vue'
+import NuovoOggetto from '@/components/NuovoOggetto.vue';
+import CategoriaPage from '@/components/CategoriaPage.vue';
 
 
 const router = createRouter({
@@ -57,6 +59,18 @@ const router = createRouter({
     path: '/risultati-ricerca',
     name: 'RisultatiRicerca',
     component: CercaOggetti
+    },
+
+    {
+    path: '/nuovo-oggetto',
+    name: 'NuovoOggetto',
+    component: NuovoOggetto,
+    },
+
+    {
+    path: '/categoria/:nomeCategoria',
+    name: 'CategoriaPage',
+    component: CategoriaPage
     }
    
   ],
