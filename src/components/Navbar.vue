@@ -12,8 +12,14 @@ onMounted(() => {
 })
 
 const handleSearch = () => {
-  console.log('Searching for:', searchQuery.value)
+  if (searchQuery.value.trim()) {
+    router.push({ 
+      name: 'RisultatiRicerca', 
+      query: { nome: searchQuery.value.trim() } 
+    })
+  }
 }
+
 
 // Aggiungi questa funzione per il logout
 const handleLogout = () => {

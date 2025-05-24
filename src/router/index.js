@@ -6,6 +6,7 @@ import Inbox from '@/components/Inbox.vue';
 import ProfiloUtente from '@/components/ProfiloUtente.vue';
 import OggettiPreferiti from '@/components/OggettiPreferiti.vue';
 import Noleggi from '@/components/Noleggi.vue';
+import CercaOggetti from '@/components/CercaOggetti.vue'
 
 
 const router = createRouter({
@@ -50,8 +51,13 @@ const router = createRouter({
       path: '/noleggi',
       name: 'noleggi',
       component: Noleggi,
-    }
+    }, 
 
+    {
+    path: '/risultati-ricerca',
+    name: 'RisultatiRicerca',
+    component: CercaOggetti
+    }
    
   ],
 })
