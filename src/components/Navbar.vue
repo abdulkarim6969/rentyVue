@@ -8,7 +8,7 @@ const isLoggedIn = ref(false)
 
 onMounted(() => {
   // Verifica lo stato di login al mount del componente
-  isLoggedIn.value = !!localStorage.getItem('email')
+  isLoggedIn.value = true
 })
 
 const handleSearch = () => {
@@ -17,7 +17,7 @@ const handleSearch = () => {
       name: 'RisultatiRicerca', 
       query: { nome: searchQuery.value.trim() } 
     })
-  }
+  }    
 }
 
 

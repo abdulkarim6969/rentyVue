@@ -14,9 +14,9 @@ function vaiACategoria(nomeCategoria) {
     <div class="container">
       <h2 class="section-title">Noleggia per categoria</h2>
       <div class="category-grid">
-        <div class="category-card" @click="vaiACategoria('Casa')">
+        <div class="category-card" @click="vaiACategoria('musica')">
           <Home size="64" stroke-width="1.5" />
-          <h3>Casa</h3>
+          <h3>Musica</h3>
         </div>
         <div class="category-card" @click="vaiACategoria('Libri')">
           <BookOpen size="64" stroke-width="1.5" />

@@ -1,12 +1,12 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faHeart as fasHeart, faTag, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
-import { library } from '@fortawesome/fontawesome-svg-core';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import FavoriteButton from '@/components/FavoriteButton.vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faTag, faInfoCircle } from '@fortawesome/free-solid-svg-icons'
+import { library } from '@fortawesome/fontawesome-svg-core'
 
-library.add(fasHeart, farHeart, faTag, faInfoCircle);
+library.add(faTag, faInfoCircle)
 
 const props = defineProps({
   title: String,
@@ -16,23 +16,18 @@ const props = defineProps({
   description: String,
   category: String,
   attributes: Array
-});
+})
 
-const router = useRouter();
-const isFavorite = ref(false);
-const showAttributes = ref(false);
-
-const toggleFavorite = () => {
-  isFavorite.value = !isFavorite.value;
-};
+const router = useRouter()
+const showAttributes = ref(false)
 
 const formatPrice = (price) => {
   return new Intl.NumberFormat('it-IT', {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 2
-  }).format(price);
-};
+  }).format(price)
+}
 </script>
 
 <template>
@@ -70,9 +65,7 @@ const formatPrice = (price) => {
         <button class="rent-btn" @click="router.push(`/products/${productId}`)">
           Noleggia
         </button>
-        <button class="heart-btn" @click="toggleFavorite">
-          <FontAwesomeIcon :icon="[isFavorite ? 'fas' : 'far', 'heart']" />
-        </button>
+        <FavoriteButton :productId="productId" />
       </div>
     </div>
   </div>
