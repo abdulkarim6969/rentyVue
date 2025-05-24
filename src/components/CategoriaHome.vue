@@ -22,9 +22,9 @@ function vaiACategoria(nomeCategoria) {
           <BookOpen size="64" stroke-width="1.5" />
           <h3>Libri</h3>
         </div>
-        <div class="category-card" @click="vaiACategoria('Elettronica')">
+        <div class="category-card" @click="vaiACategoria('Elettrodomestici')">
           <Monitor size="64" stroke-width="1.5" />
-          <h3>Elettronica</h3>
+          <h3>Elettrodomestici</h3>
         </div>
       </div>
     </div>
