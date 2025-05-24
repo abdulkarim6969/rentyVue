@@ -56,43 +56,37 @@ onMounted(async () => {
   }
 });
 </script>
-
 <template>
   <div class="user-profile">
-    <!-- ... resto del codice ... -->
-    <div class="profile-header">
-      <div class="profile-info">
-        <h2>{{ user.nome }} {{ user.cognome }}</h2>
-        
-        <div class="contact-details">
-          <div class="contact-item">
-            <svg>...</svg>
-            <span>👤 {{ user.username }}</span>
-          </div>
-          
-          <div class="contact-item">
-            <svg>...</svg>
-            <span>📧 {{ user.email }}</span>
-          </div>
-          
-          <div class="contact-item">
-            <svg>...</svg>
-            <span>📅 {{ user.dataNascita }}</span>
-          </div>
-          
-          <div class="contact-item">
-            <svg>...</svg>
-            <span>📱 {{ user.telefono }}</span>
-          </div>
-        </div>
+    <div v-if="isLoading">Caricamento...</div>
 
-        <p>🏠 {{ user.indirizzo }}, {{ user.cap }} {{ user.citta }}</p>
-        
-        <div class="verified-section">
-          
+    <div v-else-if="error">{{ error }}</div>
+
+    <div v-else>
+      <div class="profile-header">
+        <div class="profile-info">
+          <h2>{{ user.nome }} {{ user.cognome }}</h2>
+          <div class="contact-details">
+            <div class="contact-item">
+              <svg>...</svg>
+              <span>👤 {{ user.username }}</span>
+            </div>
+            <div class="contact-item">
+              <svg>...</svg>
+              <span>📧 {{ user.email }}</span>
+            </div>
+            <div class="contact-item">
+              <svg>...</svg>
+              <span>📅 {{ user.dataNascita }}</span>
+            </div>
+            <div class="contact-item">
+              <svg>...</svg>
+              <span>📱 {{ user.telefono }}</span>
+            </div>
+          </div>
+          <p>🏠 {{ user.indirizzo }}, {{ user.cap }} {{ user.citta }}</p>
         </div>
       </div>
-    </div>
 
       <h3 class="section-title">Oggetti in noleggio ({{ userProducts.length }})</h3>
       <div class="product-grid">
@@ -109,7 +103,7 @@ onMounted(async () => {
         />
       </div>
     </div>
-  
+  </div>
 </template>
 
 <!-- Aggiungi questi stili per le nuove informazioni -->
