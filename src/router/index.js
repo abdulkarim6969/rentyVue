@@ -22,8 +22,9 @@ const router = createRouter({
 
     {
       path: '/login',
-      name: 'login',
-      component: Login,
+      name: 'Login',
+      component: () => import('@/components/Login.vue'),
+      meta: { hideNavbar: true }
     },
 
     {

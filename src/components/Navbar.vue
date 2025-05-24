@@ -1,33 +1,25 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import router from '@/router'
-import { RouterLink } from 'vue-router'
 
 const searchQuery = ref('')
-const isLoggedIn = ref(false)
-
-onMounted(() => {
-  // Verifica lo stato di login al mount del componente
-  isLoggedIn.value = !!localStorage.getItem('email')
-})
+const authStore = useAuthStore()
+const { isLoggedIn } = storeToRefs(authStore)
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
-    router.push({ 
-      name: 'RisultatiRicerca', 
-      query: { nome: searchQuery.value.trim() } 
-    })
+    router.push({ name: 'RisultatiRicerca', query: { nome: searchQuery.value.trim() } })
   }
 }
 
-
-// Aggiungi questa funzione per il logout
 const handleLogout = () => {
-  localStorage.removeItem('email')
-  isLoggedIn.value = false
+  authStore.logout()
   router.push('/login')
 }
 </script>
+
 
 <template>
   <!-- Header Section -->
@@ -64,7 +56,7 @@ const handleLogout = () => {
           <li v-if="isLoggedIn">
             <RouterLink to="/noleggi">Noleggi</RouterLink>
           </li>
-          <li v-if="!isLoggedIn">
+          <li v-if="!authStore.isLoggedIn">
             <RouterLink to="/login">Accedi</RouterLink>
           </li>
           <li v-if="isLoggedIn">

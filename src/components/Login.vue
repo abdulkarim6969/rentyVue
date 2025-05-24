@@ -1,3 +1,26 @@
+<script setup>
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useRouter } from 'vue-router'
+
+const email = ref('')
+const password = ref('')
+const error = ref('')
+const authStore = useAuthStore()
+const router = useRouter()
+
+const handleLogin = async () => {
+  error.value = ''
+  try {
+    await authStore.login({ email: email.value, password: password.value })
+    router.push('/') // Vai alla home dopo il login
+  } catch (err) {
+    error.value = 'Email o password non validi'
+    console.error(err)
+  }
+}
+</script>
+
 <template>
   <div class="login-container">
     <div class="login-box">
@@ -30,65 +53,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import api from '@/services/api';
-
-
-
-const router = useRouter();
-const email = ref('');
-const password = ref('');
-const errorMsg = ref('');
-
-const handleLogin = async () => {
-  errorMsg.value = '';
-
-  let loginData;
-  try {
-    const response = await api.post('/api/auth/login', {
-      email: email.value,
-      password: password.value,
-    });
-    loginData = response.data;
-
-  } catch (err) {
-    console.error(err);
-    if (err.response) {
-      errorMsg.value = err.response.data.message || 'Invalid email or password.';
-    } else if (err.request) {
-      errorMsg.value = 'Errore di rete. Controlla la connessione.';
-    } else {
-      errorMsg.value = 'Errore inaspettato.';
-    }
-    return;  // esci, senza proseguire
-  }
-
-  // Se arrivi qui, la chiamata ha avuto successo:
-  const { token, tokenType } = loginData;
-
-  // 1. salva JWT
-  localStorage.setItem('token', token);
-  localStorage.setItem('tokenType', tokenType);
-
-  // 2. salva l'email del proprietario per le future chiamate
-  localStorage.setItem('email', email.value);
-
-  // 3. redirect
-  await router.push({ name: 'home' });
-
-};
-
-// const loginWithGoogle = () => {
-//   window.location.href = 'http://localhost:8080/oauth2/authorization/google';
-// };
-
-// const loginWithGithub = () => {
-//   window.location.href = 'http://localhost:8080/oauth2/authorization/github';
-// };
-</script>
 
 <style scoped>
 html, body, #app {
