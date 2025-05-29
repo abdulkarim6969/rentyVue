@@ -9,6 +9,7 @@ import Noleggi from '@/components/Noleggi.vue';
 import CercaOggetti from '@/components/CercaOggetti.vue'
 import NuovoOggetto from '@/components/NuovoOggetto.vue';
 import CategoriaPage from '@/components/CategoriaPage.vue';
+import DettaglioOggetto from '@/components/DettaglioOggetto.vue';
 
 
 const router = createRouter({
@@ -16,6 +17,13 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'loginn',
+      component: () => import('@/components/Login.vue'),
+      meta: { hideNavbar: true }
+    },
+
+    {
+      path: '/home',
       name: 'home',
       component: HomePageView,
     },
@@ -72,6 +80,12 @@ const router = createRouter({
     path: '/categoria/:nomeCategoria',
     name: 'CategoriaPage',
     component: CategoriaPage
+    },
+
+    {
+    path: '/products/:id',
+    name: 'dettagli-oggetto',
+    component: DettaglioOggetto
     }
    
   ],

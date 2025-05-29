@@ -58,7 +58,10 @@ onMounted(async () => {
 </script>
 <template>
   <div class="user-profile">
-    <div v-if="isLoading">Caricamento...</div>
+    <div v-if="isLoading" class="loading-spinner-container">
+  <div class="spinner"></div>
+  </div>
+
 
     <div v-else-if="error">{{ error }}</div>
 
@@ -229,4 +232,28 @@ onMounted(async () => {
   height: 14px;
   opacity: 0.7;
 }
+
+
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 0;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 6px solid #f3f3f3; /* colore sfondo */
+  border-top: 6px solid #007bff; /* colore attivo */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Animazione rotazione */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 </style>

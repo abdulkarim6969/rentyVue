@@ -31,6 +31,7 @@ const handleLogout = () => {
 
       <div class="container search-bar">
         <input
+        name="ricerca"
           type="text"
           v-model="searchQuery"
           placeholder="ricerca..."

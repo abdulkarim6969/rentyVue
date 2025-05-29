@@ -11,7 +11,6 @@
         <button :class="{ active: selectedTab === 'tutti' }" @click="selectedTab = 'tutti'">Tutti</button>
         <button :class="{ active: selectedTab === 'in_corso' }" @click="selectedTab = 'in_corso'">In corso</button>
         <button :class="{ active: selectedTab === 'completati' }" @click="selectedTab = 'completati'">Completati</button>
-        <button :class="{ active: selectedTab === 'annullati' }" @click="selectedTab = 'annullati'">Annullati</button>
       </div>
 
       <div class="cards">

@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar.vue';
 const form = ref({
   nome: '',
   descrizione: '',
@@ -40,7 +39,7 @@ async function submitForm() {
   )
 
   try {
-    await api.post('/api/oggetti', formData, {
+    await api.post('/api/oggetti/crea', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -57,8 +56,6 @@ async function submitForm() {
 
 
 <template>
-
-  <Navbar />
 
    <div class="new-product-page">
     <form class="product-form" @submit.prevent="handleSubmit">

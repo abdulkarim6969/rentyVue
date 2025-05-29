@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import api from '@/services/api';
 import { useRouter } from 'vue-router';
 
@@ -9,12 +9,13 @@ const prezzoGiornaliero = ref(0);
 const nomeCategoria = ref('');
 const attributi = ref([]);
 const file = ref(null);
+const categorie = ref([]);
 
 const router = useRouter();
 
 const banner = ref({
   message: '',
-  type: '', // success o error
+  type: '',
   show: false
 });
 
@@ -27,6 +28,15 @@ function showBanner(message, type = 'success') {
 
 function onFileChange(event) {
   file.value = event.target.files[0];
+}
+
+async function fetchCategorie() {
+  try {
+    const response = await api.get('/api/oggetti/categorie');
+    categorie.value = response.data;
+  } catch (error) {
+    showBanner('Errore nel caricamento delle categorie.', 'error');
+  }
 }
 
 async function submitForm() {
@@ -47,7 +57,6 @@ async function submitForm() {
     await api.post('/api/oggetti/crea', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       }
     });
 
@@ -62,6 +71,9 @@ async function submitForm() {
     showBanner(errorMessage, 'error');
   }
 }
+
+// Carica le categorie al montaggio del componente
+onMounted(fetchCategorie);
 </script>
 
 <template>
@@ -84,9 +96,15 @@ async function submitForm() {
         <input type="number" v-model.number="prezzoGiornaliero" required min="0" step="0.01" />
       </div>
       <div>
-        <label>Categoria</label>
-        <input type="text" v-model="nomeCategoria" required />
-      </div>
+      <label>Categoria</label>
+      <select v-model="nomeCategoria" required>
+        <option disabled value="">Seleziona una categoria</option>
+        <option v-for="cat in categorie" :key="cat.id" :value="cat.nome">
+          {{ cat.nome }}
+        </option>
+      </select>
+    </div>  
+
       <div>
         <label>Immagine</label>
         <input type="file" @change="onFileChange" accept="image/*" />

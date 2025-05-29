@@ -1,14 +1,19 @@
 // src/stores/useAuthStore.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from 'axios'
+
+import api from '@/services/api';
 
 export const useAuthStore = defineStore('auth', () => {
-  const isLoggedIn = ref(!!localStorage.getItem('token'))
+  const isLoggedIn = ref(!!localStorage.getItem('email'))
+
+  const checkAuthStatus = () => {
+  isLoggedIn.value = !!localStorage.getItem('email')
+}
 
   const login = async ({ email, password }) => {
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/login', {
+      const res = await api.post('http://localhost:8080/api/auth/login', {
         email,
         password
       })
@@ -25,12 +30,24 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const logout = () => {
-    localStorage.removeItem('email')
-    localStorage.removeItem('token')
-    localStorage.removeItem('tokenType')
-    isLoggedIn.value = false
-  }
+const logout = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await api.post('http://localhost:8080/api/auth/logoutt');
+        console.log(res);
+        
+        console.log(res.data);
+        localStorage.removeItem('email');
+        localStorage.removeItem('token');
+        localStorage.removeItem('tokenType');
+        isLoggedIn.value = false;
+        // Opcional: redirigir al usuario
+    } catch (error) {
+        console.error("Error al hacer logout:", error);
+        // Puedes mostrar un mensaje al usuario o reintentar
+    }
+}
 
-  return { isLoggedIn, login, logout }
+
+  return { isLoggedIn, login, logout, checkAuthStatus }
 })

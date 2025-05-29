@@ -9,9 +9,9 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fasHeart, farHeart, faTag, faInfoCircle);
 
 const props = defineProps({
+  productId: Number,
   title: String,
   image: String,
-  productId: Number,
   price: Number,
   description: String,
   category: String,
@@ -33,6 +33,23 @@ const formatPrice = (price) => {
     minimumFractionDigits: 2
   }).format(price);
 };
+
+const goToDetails = () => {
+  router.push({
+    name: 'dettagli-oggetto',
+    params: { id: props.productId },
+    query: {
+      title: props.title,
+      image: props.image,
+      price: props.price,
+      description: props.description,
+      category: props.category,
+      attributes: JSON.stringify(props.attributes)
+    }
+  });
+};
+
+
 </script>
 
 <template>
@@ -67,7 +84,7 @@ const formatPrice = (price) => {
       </div>
       
       <div class="actions">
-        <button class="rent-btn" @click="router.push(`/products/${productId}`)">
+        <button class="rent-btn"  @click="goToDetails">
           Noleggia
         </button>
         <button class="heart-btn" @click="toggleFavorite">

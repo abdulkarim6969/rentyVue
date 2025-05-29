@@ -3,10 +3,16 @@ import { onMounted, ref } from 'vue';
 import CategoriaHome from '@/components/CategoriaHome.vue';
 import Oggetto from '@/components/Oggettocard2.vue'; // Assicurati che punti al componente corretto
 import { fetchOggettiRandom } from '@/services/oggetti2.js';
+import { fetchOggettiRandomPublic } from '@/services/oggetti2.js';
+import { useAuthStore } from '@/stores/useAuthStore'
+import { storeToRefs } from 'pinia'
+
 import { useRouter } from 'vue-router';
 
 const oggetti = ref([]);
 const router = useRouter();
+const authStore = useAuthStore()
+const { isLoggedIn } = storeToRefs(authStore)
 
 
 const formatBase64 = (base64) => {
@@ -20,19 +26,33 @@ onMounted(async () => {
   try {
     const start = 1;
     const end = 7;
-    const emailProprietario = localStorage.getItem('email');
+    let response;
 
-    const response = await fetchOggettiRandom(start, end, emailProprietario);
-    
+    if (isLoggedIn) {
+      // Utente loggato
+      console.log('Chiamata ...');
+      const emailProprietario = localStorage.getItem('email');
+
+      response = await fetchOggettiRandom(start, end, emailProprietario);
+    } else {
+      console.log('Chiamata fetchOggettiRandomPublic...');
+      try {
+        const data = await fetchOggettiRandomPublic(1, 7);
+        console.log('Dati ricevuti:', data);
+      } catch (error) {
+        console.error('Errore axios:', error);
+      }
+      
+    }
+
     oggetti.value = (response.oggetti || []).map(item => ({
-      id: item.id,
+      productId: item.id,
       title: item.nome,
       description: item.descrizione,
       price: item.prezzoGiornaliero,
       category: item.nomeCategoria,
-      image: formatBase64(item.immagineBase64), // Assicurati che il campo sia corretto
-      attributes: item.attributi || [],
-      productId: item.id
+      image: formatBase64(item.immagineBase64),
+      attributes: item.attributi || []
     }));
 
   } catch (error) {
@@ -41,8 +61,15 @@ onMounted(async () => {
   }
 });
 
+
 function vaiANuovoOggetto() {
-  router.push('/nuovo-oggetto');
+  if(isLoggedIn){
+    router.push('/nuovo-oggetto');
+  }
+  else{
+    router.push('/login')
+
+  }
 }
 
 </script>
@@ -64,17 +91,17 @@ function vaiANuovoOggetto() {
     <section class="products">
       <div class="container">
         <div class="product-grid">
-          <Oggetto
-            v-for="oggetto in oggetti"
-            :key="oggetto.id"
-            :title="oggetto.title"
-            :image="oggetto.image"
-            :product-id="oggetto.id"
-            :price="oggetto.price"
-            :category="oggetto.category"
-            :description="oggetto.description"
-            :attributes="oggetto.attributes"
-          />
+        <Oggetto
+          v-for="oggetto in oggetti"
+          :key="oggetto.productId"
+          :productId="oggetto.productId"
+          :title="oggetto.title"
+          :image="oggetto.image"
+          :price="oggetto.price"
+          :category="oggetto.category"
+          :description="oggetto.description"
+          :attributes="oggetto.attributes"
+        />
         </div>
       </div>
     </section>
