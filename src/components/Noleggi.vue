@@ -1,109 +1,245 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import api from '@/services/api';
+import OggettoCard from '@/components/OggettoNoleggiatoCard.vue'
+
+const email = localStorage.getItem('email');
+
+const richiesteRicevute = ref([]);
+const noleggiEffettuati = ref([]);
+const loading = ref(true);
+const attiviProprietario = ref([]);
+const attiviAcquirente = ref([]);
+
+const fetchNoleggiAttivi = async () => {
+  try {
+    const [resProp, resAcq] = await Promise.all([
+      api.get(`/api/noleggi/attivi/proprietario/${email}`),
+      api.get(`/api/noleggi/attivi/acquirente/${email}`)
+    ]);
+
+    attiviProprietario.value = resProp.data.map(n => ({
+    productId: n.oggetto.id,
+    title: n.oggetto.nome,
+    image: `data:image/jpeg;base64,${n.oggetto.immagineBase64}`,
+    price: n.oggetto.prezzoGiornaliero,
+    description: n.oggetto.descrizione,
+    category: n.oggetto.nomeCategoria,
+    attributes: n.oggetto.attributi,
+    dataInizio: n.dataInizio,
+    dataFine: n.dataFine,
+    emailNoleggiante: n.oggetto.emailNoleggiante // oppure n.emailAcquirente, se disponibile
+  }));
+
+
+    attiviAcquirente.value = resAcq.data;
+
+
+
+  } catch (error) {
+    console.error('Errore nel recupero dei noleggi attivi:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const caricaRichiesteRicevute = async () => {
+  try {
+    const res = await api.get(`/api/noleggi/richieste/ricevute/${email}`);
+    richiesteRicevute.value = res.data;
+    console.log(res.data);
+    
+  } catch (error) {
+    console.error('Errore nel caricare le richieste ricevute:', error);
+  }
+};
+
+const vista = ref('richieste');
+
+
+const accettaRichiesta = async (id) => {
+  try {
+    await api.post(`/api/noleggi/richieste/${id}/accetta`);
+    caricaRichiesteRicevute(); // aggiorna dopo l'azione
+  } catch (error) {
+    console.error('Errore durante l\'accettazione:', error);
+  }
+};
+
+const rifiutaRichiesta = async (id) => {
+  try {
+    await api.post(`/api/noleggi/richieste/${id}/rifiuta`);
+    caricaRichiesteRicevute(); // aggiorna dopo l'azione
+  } catch (error) {
+    console.error('Errore durante il rifiuto:', error);
+  }
+};
+
+onMounted(() => {
+  caricaRichiesteRicevute();
+  fetchNoleggiAttivi();
+  // TODO: caricare i noleggi effettuati da endpoint futuro
+});
+</script>
+
 <template>
-  <div class="noleggi-page">
-    <aside class="sidebar">
-      <h2>I miei Noleggi</h2>
-      <button class="sidebar-btn">Noleggiati</button>
-      <button class="sidebar-btn">Messi a noleggio</button>
-    </aside>
+  <div class="noleggi-container">
+    <div class="view-buttons">
+      <button :class="{ active: vista === 'richieste' }" @click="vista = 'richieste'">Richieste Ricevute</button>
+      <button :class="{ active: vista === 'proprietario' }" @click="vista = 'proprietario'">Noleggi da Proprietario</button>
+      <button :class="{ active: vista === 'acquirente' }" @click="vista = 'acquirente'">Noleggi da Acquirente</button>
+    </div>
 
-    <main class="main-content">
-      <div class="tabs">
-        <button :class="{ active: selectedTab === 'tutti' }" @click="selectedTab = 'tutti'">Tutti</button>
-        <button :class="{ active: selectedTab === 'in_corso' }" @click="selectedTab = 'in_corso'">In corso</button>
-        <button :class="{ active: selectedTab === 'completati' }" @click="selectedTab = 'completati'">Completati</button>
+    <!-- Richieste ricevute -->
+    <section v-if="vista === 'richieste'">
+      <h2>Richieste Ricevute</h2>
+      <div v-if="richiesteRicevute.length === 0">Nessuna richiesta ricevuta.</div>
+      <div v-else class="richiesta" v-for="(richiesta, index) in richiesteRicevute" :key="index">
+        <p><strong>Email richiedente:</strong> {{ richiesta.emailUtente }}</p>
+        <p><strong>Codice Oggetto:</strong> {{ richiesta.codiceOggetto }}</p>
+        <p><strong>Dal:</strong> {{ richiesta.dataInizio }}</p>
+        <p><strong>Al:</strong> {{ richiesta.dataFine }}</p>
+        <div class="buttons">
+          <button @click="accettaRichiesta(richiesta.idNoleggio)">Accetta</button>
+          <button @click="rifiutaRichiesta(richiesta.idNoleggio)">Rifiuta</button>
+        </div>
       </div>
+    </section>
 
-      <div class="cards">
-        <RichiestaNoleggioCard
-          v-for="(noleggio, index) in noleggi"
-          :key="index"
-          :title="noleggio.title"
-          :image="noleggio.image"
-          :productId="noleggio.productId"
+    <!-- Noleggi come proprietario -->
+    <section v-if="vista === 'proprietario'">
+      <h2>Noleggi in corso come proprietario</h2>
+      <div v-if="loading">Caricamento in corso...</div>
+      <div v-else-if="attiviProprietario.length === 0">
+        Nessun noleggio attivo come proprietario.
+      </div>
+      <div v-else class="noleggi-grid">
+        <OggettoCard
+          v-for="oggetto in attiviProprietario"
+          :key="oggetto.productId"
+          :product-id="oggetto.productId"
+          :title="oggetto.title"
+          :image="oggetto.image"
+          :price="oggetto.price"
+          :description="oggetto.description"
+          :category="oggetto.category"
+          :attributes="oggetto.attributes"
+          :data-inizio="oggetto.dataInizio"
+          :data-fine="oggetto.dataFine"
+          :email-noleggiante="oggetto.emailNoleggiante"
         />
       </div>
-    </main>
+    </section>
+
+    <!-- Noleggi come acquirente -->
+    <section v-if="vista === 'acquirente'">
+      <h2>Noleggi in corso come acquirente</h2>
+      <div v-if="loading">Caricamento in corso...</div>
+      <div v-else-if="attiviAcquirente.length === 0">
+        Nessun noleggio attivo come acquirente.
+      </div>
+      <div v-else class="noleggi-grid">
+        <OggettoCard
+          v-for="oggetto in attiviAcquirente"
+          :key="oggetto.id"
+          :product-id="oggetto.id"
+          :title="oggetto.nome"
+          :image="oggetto.immagineBase64"
+          :price="oggetto.prezzoGiornaliero"
+          :description="oggetto.descrizione"
+          :category="oggetto.nomeCategoria"
+          :attributes="oggetto.attributi"
+        />
+      </div>
+    </section>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import RichiestaNoleggioCard from './RichiestaNoleggiCard.vue';
-
-const selectedTab = ref('tutti');
-
-const noleggi = ref([
-  {
-    title: 'Jeans corto blu scuro',
-    image: 'https://via.placeholder.com/120x120?text=Jeans',
-    productId: 1,
-  },
-  {
-    title: 'Scarpe Adidas',
-    image: 'https://via.placeholder.com/120x120?text=Scarpe',
-    productId: 2,
-  },
-  {
-    title: 'Occhiali Anguria',
-    image: 'https://via.placeholder.com/120x120?text=Occhiali',
-    productId: 3,
-  },
-]);
-</script>
-
 <style scoped>
-.noleggi-page {
-  display: flex;
-  gap: 2rem;
+.noleggi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.mt-8 {
+  margin-top: 2rem;
 }
 
-.sidebar {
-  width: 200px;
-  padding: 1rem;
-  margin-right: 100px;
+
+.noleggi-container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: auto;
 }
 
-.sidebar h2 {
-  margin-bottom: 1rem;
+section {
+  margin-bottom: 3rem;
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.sidebar-btn {
-  display: block;
-  width: 100%;
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
-  background-color: #f1f1f1;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  text-align: left;
-}
-
-.main-content {
-  flex: 1;
-}
-
-.tabs {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.tabs button {
-  background: none;
+.richiesta {
   border: 1px solid #ccc;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 8px;
 }
 
-.tabs .active {
-  background-color: #ddd;
-}
-
-.cards {
+.buttons {
   display: flex;
-  flex-direction: column;
   gap: 1rem;
+  margin-top: 1rem;
 }
+
+button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:first-child {
+  background-color: #2ecc71;
+  color: white;
+}
+
+button:last-child {
+  background-color: #e74c3c;
+  color: white;
+}
+
+
+.view-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.view-buttons button {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #e0e0e0;
+}
+
+.view-buttons button.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #2980b9;
+}
+
+section {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
 </style>
