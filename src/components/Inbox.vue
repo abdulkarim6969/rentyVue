@@ -52,6 +52,7 @@ onMounted(async () => {
         >
           <h4>{{ msg.nomeOggetto }}</h4>
           <p class="text">{{ msg.messaggio }}</p>
+          <p v-if="msg.idOggetto == null" class="deleted-note">Oggetto eliminato</p>
           <p class="sender">Da: {{ msg.emailMittente }}</p>
           <p class="date">{{ new Date(msg.data).toLocaleString() }}</p>
         </div>
@@ -166,4 +167,11 @@ onMounted(async () => {
   margin-bottom: 1rem;
   color: #2c3e50;
 }
+
+.deleted-note {
+  color: #000000; /* rosso tenue */
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
 </style>
