@@ -1,12 +1,10 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import FavoriteButton from '@/components/FavoriteButton.vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faTag, faInfoCircle } from '@fortawesome/free-solid-svg-icons'
-import { library } from '@fortawesome/fontawesome-svg-core'
+import { ref } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faTag, faInfoCircle, faUser } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
 
-library.add(faTag, faInfoCircle)
+library.add(faTag, faInfoCircle, faUser);
 
 const props = defineProps({
   productId: Number,
@@ -15,36 +13,21 @@ const props = defineProps({
   price: Number,
   description: String,
   category: String,
-  attributes: Array
-})
+  attributes: Array,
+  dataInizio: String,
+  dataFine: String,
+  emailNoleggiante: String
+});
 
-const router = useRouter()
-const showAttributes = ref(false)
+const showAttributes = ref(false);
 
 const formatPrice = (price) => {
   return new Intl.NumberFormat('it-IT', {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 2
-  }).format(price)
-}
-
-const goToDetails = () => {
-  router.push({
-    name: 'dettagli-oggetto',
-    params: { id: props.productId },
-    query: {
-      title: props.title,
-      image: props.image,
-      price: props.price,
-      description: props.description,
-      category: props.category,
-      attributes: JSON.stringify(props.attributes)
-    }
-  });
+  }).format(price);
 };
-
-
 </script>
 
 <template>
@@ -55,34 +38,33 @@ const goToDetails = () => {
         {{ category }}
       </div>
     </div>
-    
+
     <img :src="image" :alt="title" class="product-image" />
-    
+
     <div class="product-info">
       <h3>{{ title }}</h3>
-      
+
       <div class="price">
         {{ formatPrice(price) }}<span class="day">/giorno</span>
       </div>
-      
+
       <p class="description">{{ description }}</p>
-      
+
+      <div class="noleggio-info">
+        <p><strong>Inizio:</strong> {{ dataInizio }}</p>
+        <p><strong>Fine:</strong> {{ dataFine }}</p>
+        <p><FontAwesomeIcon :icon="['fas', 'user']" /> <strong>Noleggiato da:</strong> {{ emailNoleggiante }}</p>
+      </div>
+
       <div class="attributes-toggle" @click="showAttributes = !showAttributes">
         <FontAwesomeIcon :icon="['fas', 'info-circle']" />
         {{ showAttributes ? 'Nascondi dettagli' : 'Mostra dettagli' }}
       </div>
-      
+
       <div v-if="showAttributes" class="attributes">
         <div v-for="attr in attributes" :key="attr.nomeAttributo" class="attribute">
           <strong>{{ attr.nomeAttributo }}:</strong> {{ attr.valore }}
         </div>
-      </div>
-      
-      <div class="actions">
-        <button class="rent-btn"  @click="goToDetails">
-          Noleggia
-        </button>
-        <FavoriteButton :productId="productId" />
       </div>
     </div>
   </div>
@@ -151,6 +133,16 @@ const goToDetails = () => {
   margin: 1rem 0;
 }
 
+.noleggio-info {
+  background: #f9f9f9;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  color: #444;
+  line-height: 1.5;
+}
+
 .attributes-toggle {
   color: #3498db;
   cursor: pointer;
@@ -176,26 +168,5 @@ const goToDetails = () => {
   justify-content: space-between;
   margin: 0.3rem 0;
   font-size: 0.9rem;
-}
-
-.actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.2rem;
-}
-
-.rent-btn {
-  background-color: #2c3e50;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  flex-grow: 1;
-  transition: background-color 0.2s;
-}
-
-.rent-btn:hover {
-  background-color: #2980b9;
 }
 </style>

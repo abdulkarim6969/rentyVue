@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import Oggetto from '@/components/Oggettocard2.vue';
+import Oggetto from '@/components/OggettoProfilo.vue';
 import api from '@/services/api'
 
 const route = useRoute();
@@ -9,6 +9,11 @@ const user = ref(null);
 const userProducts = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
+
+const handleDelete = (deletedId) => {
+  userProducts.value = userProducts.value.filter(product => product.id !== deletedId);
+};
+
 
 onMounted(async () => {
   try {
@@ -58,7 +63,10 @@ onMounted(async () => {
 </script>
 <template>
   <div class="user-profile">
-    <div v-if="isLoading">Caricamento...</div>
+    <div v-if="isLoading" class="loading-spinner-container">
+  <div class="spinner"></div>
+  </div>
+
 
     <div v-else-if="error">{{ error }}</div>
 
@@ -100,7 +108,9 @@ onMounted(async () => {
           :category="product.category"
           :description="product.description"
           :attributes="product.attributes"
+          @deleted="handleDelete"
         />
+
       </div>
     </div>
   </div>
@@ -229,4 +239,28 @@ onMounted(async () => {
   height: 14px;
   opacity: 0.7;
 }
+
+
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 0;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 6px solid #f3f3f3; /* colore sfondo */
+  border-top: 6px solid #007bff; /* colore attivo */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Animazione rotazione */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 </style>

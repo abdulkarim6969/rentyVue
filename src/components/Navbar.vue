@@ -26,11 +26,12 @@ const handleLogout = () => {
   <header class="header">
     <div class="container header-content">
       <div class="logo">
-        <RouterLink to="/"><h1>Renty</h1></RouterLink>
+        <RouterLink to="/home"><h1>Renty</h1></RouterLink>
       </div>
 
       <div class="container search-bar">
         <input
+        name="ricerca"
           type="text"
           v-model="searchQuery"
           placeholder="ricerca..."

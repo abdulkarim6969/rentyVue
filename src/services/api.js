@@ -10,8 +10,11 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(config => {
+  // Se è presente config.noAuth, non aggiungere il token
+  if (config.noAuth) return config;
+
   const token = localStorage.getItem('token');
-  const tokenType = localStorage.getItem('tokenType') || 'Bearer'; // Default to Bearer if not saved separately
+  const tokenType = localStorage.getItem('tokenType') || 'Bearer';
   if (token) {
     config.headers.Authorization = `${tokenType} ${token}`;
   }

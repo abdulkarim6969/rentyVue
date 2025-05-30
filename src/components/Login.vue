@@ -13,7 +13,7 @@ const handleLogin = async () => {
   error.value = ''
   try {
     await authStore.login({ email: email.value, password: password.value })
-    router.push('/') // Vai alla home dopo il login
+    router.push('/home') // Vai alla home dopo il login
   } catch (err) {
     error.value = 'Email o password non validi'
     console.error(err)
@@ -27,8 +27,8 @@ const handleLogin = async () => {
       <h1>Accedi al tuo Account</h1>
 
       <!-- Error message -->
-      <div v-if="errorMsg" class="error" role="alert">
-        {{ errorMsg }}
+      <div v-if="error" class="error" role="alert">
+        {{ error }}
       </div>
 
       <form @submit.prevent="handleLogin" class="login-form">
