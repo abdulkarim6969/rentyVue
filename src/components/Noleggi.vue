@@ -28,13 +28,22 @@ const fetchNoleggiAttivi = async () => {
     attributes: n.oggetto.attributi,
     dataInizio: n.dataInizio,
     dataFine: n.dataFine,
-    emailNoleggiante: n.oggetto.emailNoleggiante // oppure n.emailAcquirente, se disponibile
+    emailNoleggiante: n.email // oppure n.emailAcquirente, se disponibile
   }));
 
-
-    attiviAcquirente.value = resAcq.data;
-
-
+  attiviAcquirente.value = resAcq.data.map(n => ({
+    productId: n.oggetto.id,
+    title: n.oggetto.nome,
+    image: `data:image/jpeg;base64,${n.oggetto.immagineBase64}`,
+    price: n.oggetto.prezzoGiornaliero,
+    description: n.oggetto.descrizione,
+    category: n.oggetto.nomeCategoria,
+    attributes: n.oggetto.attributi,
+    dataInizio: n.dataInizio,
+    dataFine: n.dataFine,
+    emailNoleggiante: n.oggetto.emailProprietario}));
+    
+    
 
   } catch (error) {
     console.error('Errore nel recupero dei noleggi attivi:', error);
@@ -78,6 +87,8 @@ const rifiutaRichiesta = async (id) => {
 onMounted(() => {
   caricaRichiesteRicevute();
   fetchNoleggiAttivi();
+   console.log("acquirente" + attiviAcquirente.value);
+    console.log("propritario" + attiviProprietario.value);
   // TODO: caricare i noleggi effettuati da endpoint futuro
 });
 </script>
@@ -94,16 +105,14 @@ onMounted(() => {
     <section v-if="vista === 'richieste'">
       <h2>Richieste Ricevute</h2>
       <div v-if="richiesteRicevute.length === 0">Nessuna richiesta ricevuta.</div>
-      <div v-else class="richiesta" v-for="(richiesta, index) in richiesteRicevute" :key="index">
-        <p><strong>Email richiedente:</strong> {{ richiesta.emailUtente }}</p>
-        <p><strong>Codice Oggetto:</strong> {{ richiesta.codiceOggetto }}</p>
-        <p><strong>Dal:</strong> {{ richiesta.dataInizio }}</p>
-        <p><strong>Al:</strong> {{ richiesta.dataFine }}</p>
-        <div class="buttons">
-          <button @click="accettaRichiesta(richiesta.idNoleggio)">Accetta</button>
-          <button @click="rifiutaRichiesta(richiesta.idNoleggio)">Rifiuta</button>
-        </div>
-      </div>
+      <RichiestaNoleggioCard
+        v-for="(richiesta, index) in richiesteRicevute"
+        :key="index"
+        :richiesta="richiesta"
+        :oggetto="richiesta.oggetto"
+        @accetta="accettaRichiesta"
+        @rifiuta="rifiutaRichiesta"
+      />
     </section>
 
     <!-- Noleggi come proprietario -->
@@ -141,14 +150,17 @@ onMounted(() => {
       <div v-else class="noleggi-grid">
         <OggettoCard
           v-for="oggetto in attiviAcquirente"
-          :key="oggetto.id"
-          :product-id="oggetto.id"
-          :title="oggetto.nome"
-          :image="oggetto.immagineBase64"
-          :price="oggetto.prezzoGiornaliero"
-          :description="oggetto.descrizione"
-          :category="oggetto.nomeCategoria"
-          :attributes="oggetto.attributi"
+          :key="oggetto.productId"
+          :product-id="oggetto.productId"
+          :title="oggetto.title"
+          :image="oggetto.image"
+          :price="oggetto.price"
+          :description="oggetto.description"
+          :category="oggetto.category"
+          :attributes="oggetto.attributes"
+          :data-inizio="oggetto.dataInizio"
+          :data-fine="oggetto.dataFine"
+          :email-noleggiante="oggetto.emailNoleggiante"
         />
       </div>
     </section>

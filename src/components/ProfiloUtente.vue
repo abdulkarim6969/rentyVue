@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import Oggetto from '@/components/Oggettocard2.vue';
+import Oggetto from '@/components/OggettoProfilo.vue';
 import api from '@/services/api'
 
 const route = useRoute();
@@ -9,6 +9,11 @@ const user = ref(null);
 const userProducts = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
+
+const handleDelete = (deletedId) => {
+  userProducts.value = userProducts.value.filter(product => product.id !== deletedId);
+};
+
 
 onMounted(async () => {
   try {
@@ -103,7 +108,9 @@ onMounted(async () => {
           :category="product.category"
           :description="product.description"
           :attributes="product.attributes"
+          @deleted="handleDelete"
         />
+
       </div>
     </div>
   </div>
