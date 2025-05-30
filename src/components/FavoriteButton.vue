@@ -12,46 +12,57 @@ const props = defineProps({
 const isFavorite = ref(false)
 const loading = ref(false)
 
-const token = localStorage.getItem('token')
-
 onMounted(async () => {
   try {
-    const response = await api.get(`/api/preferiti/check/${props.productId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    const response = await api.get(`/api/preferiti/check/${props.productId}`)
     isFavorite.value = response.data.preferito
+    console.log('Stato iniziale preferito:', isFavorite.value)
   } catch (error) {
     console.error('Errore nel controllo preferito:', error)
   }
 })
 
 const toggleFavorite = async () => {
-  if (loading.value) return
-  loading.value = true
+  if (loading.value) return;
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.error("Token non presente, utente non autenticato.");
+    return;
+  }
+
+  loading.value = true;
   try {
     if (isFavorite.value) {
+      console.log('Rimuovo dai preferiti:', props.productId);
       await api.delete(`/api/preferiti/rimuovi/${props.productId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      isFavorite.value = false
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      isFavorite.value = false;
     } else {
-      await api.post(`/api/preferiti/aggiungi/${props.productId}`, null, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      isFavorite.value = true
+      console.log('Aggiungo ai preferiti:', props.productId);
+      await api.post(`/api/preferiti/aggiungi/${props.productId}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      isFavorite.value = true;
     }
   } catch (error) {
-    console.error('Errore toggle preferiti:', error)
+    console.error('Errore toggle preferiti:', error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
+
 </script>
 
 <template>
   <button 
     class="heart-btn" 
-    @click.prevent="toggleFavorite" 
+    @click="toggleFavorite" 
     :aria-pressed="isFavorite.toString()" 
     :title="isFavorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'">
     <svg 
@@ -61,9 +72,11 @@ const toggleFavorite = async () => {
       fill="red" 
       width="24" height="24" 
       aria-hidden="true">
-      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 
-               7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 
-               19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+               2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09
+               C13.09 3.81 14.76 3 16.5 3 
+               19.58 3 22 5.42 22 8.5
+               c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
     </svg>
     <svg 
       v-else 
@@ -76,9 +89,11 @@ const toggleFavorite = async () => {
       stroke-linejoin="round" 
       width="24" height="24" 
       aria-hidden="true">
-      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 
-               7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 
-               19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+               2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09
+               C13.09 3.81 14.76 3 16.5 3 
+               19.58 3 22 5.42 22 8.5
+               c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
     </svg>
   </button>
 </template>
