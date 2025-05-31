@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue';
 import api from '@/services/api';
 import OggettoCard from '@/components/OggettoNoleggiatoCard.vue'
+import RichiestaNoleggioCard from '@/components/RichiestaNoleggioCard.vue';
+
 
 const email = localStorage.getItem('email');
 

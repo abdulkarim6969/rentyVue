@@ -18,7 +18,7 @@ const formatDate = (data) =>
 
 <template>
   <div class="richiesta-card">
-    <img :src="oggetto.image" :alt="oggetto.nome" class="oggetto-image" />
+    <img :src="'data:image/jpeg;base64,' + oggetto.immagineBase64" :alt="oggetto.nome" class="oggetto-image" />
 
     <div class="richiesta-info">
       <h3>{{ oggetto.nome }}</h3>

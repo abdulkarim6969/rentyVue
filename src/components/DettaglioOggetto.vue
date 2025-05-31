@@ -1,14 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Datepicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-import api from '@/services/api';
+import api from '@/services/api'
 
 const route = useRoute()
 
 const selectedRange = ref(null)
-const bookedDates = ref(new Set()) // sarà popolato con le date occupate
+const bookedDates = ref(new Set())
+const isLoading = ref(false)
 
 const fallbackImage = 'https://via.placeholder.com/250'
 
@@ -29,9 +30,37 @@ try {
   item.value.attributes = []
 }
 
-// 🔄 Chiamata per recuperare le date prenotate
+const formatDateToYMD = (date) => {
+  if (!(date instanceof Date)) {
+    date = new Date(date)
+  }
+  return date.toISOString().split('T')[0]
+}
+
+const disableBookedDates = (date) => {
+  const formatted = formatDateToYMD(date)
+  return bookedDates.value.has(formatted)
+}
+
+// Controlla se l'intervallo selezionato contiene date non disponibili
+const isRangeValid = computed(() => {
+  if (!selectedRange.value || selectedRange.value.length < 2) return false
+  
+  const [start, end] = selectedRange.value
+  const currentDate = new Date(start)
+  
+  while (currentDate <= end) {
+    if (disableBookedDates(currentDate)) {
+      return false
+    }
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+  return true
+})
+
 const fetchUnavailableDates = async () => {
   try {
+    isLoading.value = true
     const response = await api.get(`/api/noleggi/giorniOccupati/${item.value.id}`)
     const data = response.data
 
@@ -40,39 +69,55 @@ const fetchUnavailableDates = async () => {
       return
     }
 
-    if (data.length === 0) {
-      console.info('✅ Nessuna data occupata trovata.')
-      return
-    }
+    const newBookedDates = new Set()
+    data.forEach(dateStr => {
+      try {
+        const normalized = formatDateToYMD(dateStr)
+        newBookedDates.add(normalized)
+      } catch (e) {
+        console.warn('Formato data non valido:', dateStr)
+      }
+    })
 
-    bookedDates.value = new Set(
-      data.map(dateStr => new Date(dateStr).toDateString())
-    )
-
-    console.log('📅 Date occupate caricate:', bookedDates.value)
-
+    bookedDates.value = newBookedDates
+    console.log('📅 Date occupate caricate:', Array.from(bookedDates.value))
   } catch (error) {
     console.error('Errore nel fetch delle date occupate:', error)
+  } finally {
+    isLoading.value = false
   }
 }
-
-
-
-// ⛔ Disabilita le date già prenotate
-const disableBookedDates = (date) => {
-  if (!bookedDates.value || bookedDates.value.size === 0) return false
-  return bookedDates.value.has(date.toDateString())
-}
-
-// 📦 Prenotazione fittizia (alert)
-const rentItem = () => {
-  if (!selectedRange.value) {
-    alert('Seleziona un intervallo di date per procedere.')
+const rentItem = async () => {
+  if (!isRangeValid.value) {
+    alert('L\'intervallo selezionato contiene date non disponibili. Seleziona un altro periodo.')
     return
   }
 
-  alert(`Hai prenotato dal ${selectedRange.value.start.toLocaleDateString()} al ${selectedRange.value.end.toLocaleDateString()}.`)
+  const [start, end] = selectedRange.value
+
+  try {
+    const payload = {
+      idNoleggio: null, // sarà generato dal backend se necessario
+      emailUtenteRichiedente: localStorage.getItem('email'), // Assicurati che l'email sia salvata nel localStorage
+      codiceOggetto: parseInt(item.value.id),
+      dataInizio: formatDateToYMD(start),
+      dataFine: formatDateToYMD(end),
+      oggetto: null // opzionale se il backend lo ignora
+    }
+
+    const response = await api.post('/api/noleggi/richieste', payload)
+    
+    alert('✅ Richiesta di noleggio inviata con successo!')
+    // Puoi anche fare un redirect o aggiornare la UI qui
+  } catch (error) {
+    console.error('Errore durante l\'invio della richiesta:', error)
+    alert('❌ Errore durante l\'invio della richiesta di noleggio.')
+  }
 }
+
+watch(bookedDates, () => {
+  selectedRange.value = null
+}, { deep: true })
 
 onMounted(() => {
   fetchUnavailableDates()
@@ -102,15 +147,32 @@ onMounted(() => {
 
       <div class="calendar">
         <h3>Seleziona le date per il noleggio:</h3>
+        <div v-if="isLoading">Caricamento date disponibili...</div>
         <Datepicker
+          v-else
           v-model="selectedRange"
           :disabled-date="disableBookedDates"
           range
           placeholder="Seleziona intervallo"
           :min-date="new Date()"
+          :hide-offset-dates="true"
+          :highlight="{
+            dates: Array.from(bookedDates).map(d => new Date(d)),
+            color: '#ff8080',
+            opacity: 0.5
+          }"
         />
+        <div v-if="selectedRange && !isRangeValid" class="error-message">
+          Attenzione: L'intervallo selezionato contiene date non disponibili
+        </div>
       </div>
-      <button @click="rentItem" class="rent-button">Noleggia</button>
+      <button 
+        @click="rentItem" 
+        class="rent-button" 
+        :disabled="!selectedRange || !isRangeValid || isLoading"
+      >
+        {{ isLoading ? 'Caricamento...' : 'Noleggia' }}
+      </button>
     </div>
   </div>
 </template>
@@ -147,5 +209,18 @@ onMounted(() => {
   font-size: 1rem;
   border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+.rent-button:hover {
+  background-color: #0056b3;
+}
+.rent-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+.error-message {
+  color: #d32f2f;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
 }
 </style>
