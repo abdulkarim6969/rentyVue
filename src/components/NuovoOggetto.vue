@@ -7,7 +7,6 @@ const nome = ref('');
 const descrizione = ref('');
 const prezzoGiornaliero = ref(0);
 const nomeCategoria = ref('');
-const attributi = ref([]);
 const file = ref(null);
 const categorie = ref([]);
 
@@ -47,8 +46,7 @@ async function submitForm() {
       descrizione: descrizione.value,
       prezzoGiornaliero: prezzoGiornaliero.value,
       emailProprietario: localStorage.getItem('email'),
-      nomeCategoria: nomeCategoria.value,
-      attributi: attributi.value,
+      nomeCategoria: nomeCategoria.value
     };
 
     formData.append('file', file.value);
@@ -65,14 +63,12 @@ async function submitForm() {
     setTimeout(() => {
       router.push('/home');
     }, 1000);
-
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Errore nella creazione.';
     showBanner(errorMessage, 'error');
   }
 }
 
-// Carica le categorie al montaggio del componente
 onMounted(fetchCategorie);
 </script>
 
@@ -96,20 +92,21 @@ onMounted(fetchCategorie);
         <input type="number" v-model.number="prezzoGiornaliero" required min="0" step="0.01" />
       </div>
       <div>
-      <label>Categoria</label>
-      <select v-model="nomeCategoria" required>
-        <option disabled value="">Seleziona una categoria</option>
-        <option v-for="cat in categorie" :key="cat.id" :value="cat.nome">
-          {{ cat.nome }}
-        </option>
-      </select>
-    </div>  
+        <label>Categoria</label>
+        <select v-model="nomeCategoria" required>
+          <option disabled value="">Seleziona una categoria</option>
+          <option v-for="cat in categorie" :key="cat.id" :value="cat.nome">
+            {{ cat.nome }}
+          </option>
+        </select>
+      </div>
 
       <div class="file-upload-wrapper">
-  <label for="file-upload" class="custom-file-upload">Scegli immagine</label>
-  <input id="file-upload" type="file" @change="onFileChange" accept="image/*" />
-  <span v-if="file">{{ file.name }}</span>
-</div>
+        <label for="file-upload" class="custom-file-upload">Scegli immagine</label>
+        <input id="file-upload" type="file" @change="onFileChange" accept="image/*" />
+        <span v-if="file">{{ file.name }}</span>
+      </div>
+
       <button type="submit">Crea Oggetto</button>
     </form>
   </div>
@@ -146,7 +143,6 @@ input[type="file"] {
   font-size: 0.95rem;
   color: #555;
 }
-
 
 .form-wrapper {
   max-width: 600px;
@@ -233,5 +229,4 @@ input[type="file"] {
 .form-crea-oggetto button:hover {
   background-color: #2980b9;
 }
-
 </style>

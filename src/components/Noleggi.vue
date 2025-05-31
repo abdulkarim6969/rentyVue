@@ -139,7 +139,7 @@ onMounted(() => {
         />
       </div>
     </section>
-
+    
     <!-- Noleggi come acquirente -->
     <section v-if="vista === 'acquirente'">
       <h2>Noleggi in corso come acquirente</h2>

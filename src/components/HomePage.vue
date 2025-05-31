@@ -74,8 +74,6 @@ function vaiANuovoOggetto() {
       <div class="container">
         <div class="hero-content">
           <h2>Metti a noleggio gli oggetti che non utilizzi</h2>
-          <p>È arrivato il momento di liberare la casa!</p>
-          <h2>Noleggia gli oggetti che non utilizzi</h2>
           <p>è arrivato il momento di liberare la casa!</p>
           <button class="cta-btn" @click="vaiANuovoOggetto">Metti a Noleggio subito</button>
         </div>
