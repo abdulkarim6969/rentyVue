@@ -37,7 +37,8 @@ const handleLogin = async () => {
         <button type="submit" class="submit-button">Login</button>
       </form>
 
-      <div class="divider">oppure</div>
+      <RouterLink to="/regi" class="divider">oppure Registrati
+      </RouterLink>
 
       <!-- @click="loginWithGoogle" -->
       <button  class="login-button google">

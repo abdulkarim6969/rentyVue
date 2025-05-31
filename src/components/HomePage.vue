@@ -1,15 +1,14 @@
- <script setup>
+<script setup>
 import { onMounted, ref } from 'vue';
 import CategoriaHome from '@/components/CategoriaHome.vue';
-import Oggetto from '@/components/Oggettocard2.vue'; // Assicurati che punti al componente corretto
+import Oggetto from '@/components/Oggettocard2.vue';
 import { fetchOggettiRandom } from '@/services/oggetti2.js';
-import { fetchOggettiRandomPublic } from '@/services/oggetti2.js';
 import { useAuthStore } from '@/stores/useAuthStore'
 import { storeToRefs } from 'pinia'
-
 import { useRouter } from 'vue-router';
 
 const oggetti = ref([]);
+const isLoading = ref(true); // 👉 Stato di caricamento
 const router = useRouter();
 const authStore = useAuthStore()
 const { isLoggedIn } = storeToRefs(authStore)
@@ -21,7 +20,6 @@ const formatBase64 = (base64) => {
     : `data:image/jpeg;base64,${base64}`;
 };
 
-
 onMounted(async () => {
   try {
     const start = 1;
@@ -29,17 +27,11 @@ onMounted(async () => {
     let response;
 
     if (isLoggedIn) {
-      // Utente loggato
-      console.log('Chiamata ...');
       const emailProprietario = localStorage.getItem('email');
-
       response = await fetchOggettiRandom(start, end, emailProprietario);
-   
-      
-      
     }
 
-    oggetti.value = (response.oggetti || []).map(item => ({
+    oggetti.value = (response?.oggetti || []).map(item => ({
       productId: item.id,
       title: item.nome,
       description: item.descrizione,
@@ -52,20 +44,18 @@ onMounted(async () => {
   } catch (error) {
     console.error('Errore nel caricamento degli oggetti:', error);
     oggetti.value = [];
+  } finally {
+    isLoading.value = false; // 👉 Nascondi spinner al termine
   }
 });
 
-
 function vaiANuovoOggetto() {
-  if(isLoggedIn){
+  if (isLoggedIn.value) {
     router.push('/nuovo-oggetto');
-  }
-  else{
-    router.push('/login')
-
+  } else {
+    router.push('/login');
   }
 }
-
 </script>
 
 <template>
@@ -84,18 +74,21 @@ function vaiANuovoOggetto() {
 
     <section class="products">
       <div class="container">
-        <div class="product-grid">
-        <Oggetto
-          v-for="oggetto in oggetti"
-          :key="oggetto.productId"
-          :productId="oggetto.productId"
-          :title="oggetto.title"
-          :image="oggetto.image"
-          :price="oggetto.price"
-          :category="oggetto.category"
-          :description="oggetto.description"
-          :attributes="oggetto.attributes"
-        />
+        <div v-if="isLoading" class="spinner-wrapper">
+          <div class="spinner"></div>
+        </div>
+        <div v-else class="product-grid">
+          <Oggetto
+            v-for="oggetto in oggetti"
+            :key="oggetto.productId"
+            :productId="oggetto.productId"
+            :title="oggetto.title"
+            :image="oggetto.image"
+            :price="oggetto.price"
+            :category="oggetto.category"
+            :description="oggetto.description"
+            :attributes="oggetto.attributes"
+          />
         </div>
       </div>
     </section>
@@ -122,7 +115,7 @@ function vaiANuovoOggetto() {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.1); 
+  background: rgba(0, 0, 0, 0.1);
   z-index: 0;
 }
 
@@ -170,5 +163,25 @@ function vaiANuovoOggetto() {
   margin-top: 2rem;
 }
 
-/* Rimuovi gli stili duplicati per .product-card che sono già nel componente */
+/* Spinner */
+.spinner-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 0;
+}
+
+.spinner {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #e74c3c;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>

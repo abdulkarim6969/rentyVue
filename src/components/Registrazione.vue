@@ -15,7 +15,8 @@
         <button type="submit" class="submit-button">Registrati</button>
       </form>
 
-      <div class="divider">oppure</div>
+       <RouterLink to="/login" class="divider">oppure Accedi
+      </RouterLink>
 
       <button @click="registerWithGoogle" class="login-button google">
         <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" />
