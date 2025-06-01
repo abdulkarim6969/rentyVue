@@ -19,12 +19,10 @@ const router = useRouter();
 
 const accettaRichiesta = () => {
   console.log(`Richiesta ${richiestaId} accettata`);
-  // qui puoi aggiungere una chiamata API tipo: axios.post(`/api/richieste/${richiestaId}/accetta`)
 };
 
 const rifiutaRichiesta = () => {
   console.log(`Richiesta ${richiestaId} rifiutata`);
-  // qui puoi aggiungere una chiamata API tipo: axios.post(`/api/richieste/${richiestaId}/rifiuta`)
 };
 
 const goToProduct = () => {

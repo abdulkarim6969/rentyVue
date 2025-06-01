@@ -8,15 +8,21 @@
       </div>
 
       <form @submit.prevent="handleRegister" class="login-form">
-        <input type="text" v-model="name" placeholder="Nome" required />
+        <input type="text" v-model="nomeUtente" placeholder="Nome utente" required />
+        <input type="text" v-model="nome" placeholder="Nome" required />
+        <input type="text" v-model="cognome" placeholder="Cognome" required />
+        <input type="text" v-model="indirizzo" placeholder="Indirizzo" required />
+        <input type="text" v-model="cap" placeholder="CAP" required />
+        <input type="text" v-model="citta" placeholder="Città" required />
+        <input type="text" v-model="telefono" placeholder="Telefono" required />
+        <input type="date" v-model="dataNascita" required />
         <input type="email" v-model="email" placeholder="Email" required />
         <input type="password" v-model="password" placeholder="Password" required />
         <input type="password" v-model="confirmPassword" placeholder="Conferma password" required />
         <button type="submit" class="submit-button">Registrati</button>
       </form>
 
-       <RouterLink to="/login" class="divider">oppure Accedi
-      </RouterLink>
+      <RouterLink to="/login" class="divider">oppure Accedi</RouterLink>
 
       <button @click="registerWithGoogle" class="login-button google">
         <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" />
@@ -37,7 +43,15 @@ import { useRouter } from 'vue-router';
 import api from '@/services/api';
 
 const router = useRouter();
-const name = ref('');
+
+const nomeUtente = ref('');
+const nome = ref('');
+const cognome = ref('');
+const indirizzo = ref('');
+const cap = ref('');
+const citta = ref('');
+const telefono = ref('');
+const dataNascita = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
@@ -53,12 +67,18 @@ const handleRegister = async () => {
 
   try {
     const response = await api.post('/api/auth/register', {
-      name: name.value,
+      nomeUtente: nomeUtente.value,
+      nome: nome.value,
+      cognome: cognome.value,
+      indirizzo: indirizzo.value,
+      cap: cap.value,
+      citta: citta.value,
+      telefono: telefono.value,
+      dataNascita: dataNascita.value,
       email: email.value,
       password: password.value,
     });
 
-    // Registrazione avvenuta con successo, procedi al login automatico o redirect
     await router.push({ name: 'dettagliOggetto' });
 
   } catch (err) {
@@ -194,16 +214,14 @@ html, body, #app {
 .login-button.github:hover {
   background-color: #1b1f23;
 }
+
+.login-container {
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.login-box {
+  margin: 40px 0;
+}
+
 </style>
-
-
-
-
-
-
-
-
-
-
-
-

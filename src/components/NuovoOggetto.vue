@@ -44,7 +44,6 @@ async function fetchCategorie() {
 async function fetchAttributiCategoria() {
   if (!nomeCategoria.value) {
     attributi.value = [];
-    // Pulisci reactive valoriAttributi
     Object.keys(valoriAttributi).forEach(key => delete valoriAttributi[key]);
     return;
   }
@@ -52,10 +51,8 @@ async function fetchAttributiCategoria() {
     const response = await api.get(`/api/oggetti/attributiCategoria/${nomeCategoria.value}`);
     attributi.value = response.data;
 
-    // Pulisci reactive valoriAttributi
     Object.keys(valoriAttributi).forEach(key => delete valoriAttributi[key]);
 
-    // Inizializza chiavi reactive
     attributi.value.forEach(attr => {
       valoriAttributi[attr.nomeAttributo] = '';
     });

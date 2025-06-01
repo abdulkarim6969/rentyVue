@@ -19,7 +19,7 @@ const caricaRichiesteRicevute = async () => {
 const accettaRichiesta = async (id) => {
   try {
     await api.post(`/api/noleggi/richieste/${id}/accetta`);
-    caricaRichiesteRicevute(); // aggiorna dopo l'azione
+    caricaRichiesteRicevute();
   } catch (error) {
     console.error('Errore durante l\'accettazione:', error);
   }
@@ -28,7 +28,7 @@ const accettaRichiesta = async (id) => {
 const rifiutaRichiesta = async (id) => {
   try {
     await api.post(`/api/noleggi/richieste/${id}/rifiuta`);
-    caricaRichiesteRicevute(); // aggiorna dopo l'azione
+    caricaRichiesteRicevute(); 
   } catch (error) {
     console.error('Errore durante il rifiuto:', error);
   }
@@ -36,7 +36,6 @@ const rifiutaRichiesta = async (id) => {
 
 onMounted(() => {
   caricaRichiesteRicevute();
-  // TODO: caricare i noleggi effettuati da endpoint futuro
 });
 </script>
 

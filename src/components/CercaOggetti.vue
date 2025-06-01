@@ -33,7 +33,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/services/api'
-import Oggetto from '@/components/Oggettocard2.vue' // Cambia se hai un altro componente
+import Oggetto from '@/components/Oggettocard2.vue' //cambia se hai un altro componente
 
 const route = useRoute()
 const risultati = ref([])
@@ -50,7 +50,7 @@ const cercaOggetti = async () => {
 
   loading.value = true
   try {
-    const token = localStorage.getItem('token')  // Assicurati che sia presente
+    const token = localStorage.getItem('token') 
     const response = await api.get(`/api/oggetti/cerca/${encodeURIComponent(nome)}`, {
       headers: {
         Authorization: `Bearer ${token}`
@@ -101,8 +101,8 @@ watch(() => route.query.nome, cercaOggetti)
 }
 
 .articoli-grid > * {
-  flex: 1 1 300px; /* Ogni item ha larghezza base 300px ma può adattarsi */
-  max-width: 350px; /* Per non crescere troppo */
+  flex: 1 1 300px;
+  max-width: 350px; 
   box-sizing: border-box;
 }
 

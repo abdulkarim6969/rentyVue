@@ -33,7 +33,6 @@ function vaiACategoria(nomeCategoria) {
 
 <style scoped>
 
-/* Categories Section */
 .categories {
   padding: 2rem 0;
   background: #f9f9f9;

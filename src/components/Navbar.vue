@@ -22,7 +22,6 @@ const handleLogout = () => {
 
 
 <template>
-  <!-- Header Section -->
   <header class="header">
     <div class="container header-content">
       <div class="logo">
@@ -67,7 +66,6 @@ const handleLogout = () => {
       </nav>
     </div>
 
-    <!-- Resto del template rimane invariato -->
   </header>
 </template>
 

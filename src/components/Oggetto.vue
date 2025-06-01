@@ -17,10 +17,6 @@ defineProps({
 const router = useRouter();
 const isFavorite = ref(false);
 
-// const goToProduct = () => {
-//   router.push({ name: 'product', params: { id: productId } });
-// };
-
 const toggleFavorite = () => {
   isFavorite.value = !isFavorite.value;
 };

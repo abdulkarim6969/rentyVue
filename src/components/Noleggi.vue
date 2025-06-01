@@ -30,7 +30,7 @@ const fetchNoleggiAttivi = async () => {
     attributes: n.oggetto.attributi,
     dataInizio: n.dataInizio,
     dataFine: n.dataFine,
-    emailNoleggiante: n.email // oppure n.emailAcquirente, se disponibile
+    emailNoleggiante: n.email 
   }));
 
   attiviAcquirente.value = resAcq.data.map(n => ({
@@ -71,7 +71,7 @@ const vista = ref('richieste');
 const accettaRichiesta = async (id) => {
   try {
     await api.post(`/api/noleggi/richieste/${id}/accetta`);
-    caricaRichiesteRicevute(); // aggiorna dopo l'azione
+    caricaRichiesteRicevute(); 
   } catch (error) {
     console.error('Errore durante l\'accettazione:', error);
   }
@@ -80,7 +80,7 @@ const accettaRichiesta = async (id) => {
 const rifiutaRichiesta = async (id) => {
   try {
     await api.post(`/api/noleggi/richieste/${id}/rifiuta`);
-    caricaRichiesteRicevute(); // aggiorna dopo l'azione
+    caricaRichiesteRicevute(); 
   } catch (error) {
     console.error('Errore durante il rifiuto:', error);
   }
@@ -91,7 +91,6 @@ onMounted(() => {
   fetchNoleggiAttivi();
    console.log("acquirente" + attiviAcquirente.value);
     console.log("propritario" + attiviProprietario.value);
-  // TODO: caricare i noleggi effettuati da endpoint futuro
 });
 </script>
 
@@ -103,7 +102,6 @@ onMounted(() => {
       <button :class="{ active: vista === 'acquirente' }" @click="vista = 'acquirente'">Noleggi da Acquirente</button>
     </div>
 
-    <!-- Richieste ricevute -->
     <section v-if="vista === 'richieste'">
       <h2>Richieste Ricevute</h2>
       <div v-if="richiesteRicevute.length === 0">Nessuna richiesta ricevuta.</div>
@@ -117,7 +115,6 @@ onMounted(() => {
       />
     </section>
 
-    <!-- Noleggi come proprietario -->
     <section v-if="vista === 'proprietario'">
       <h2>Noleggi in corso come proprietario</h2>
       <div v-if="loading">Caricamento in corso...</div>
@@ -142,7 +139,6 @@ onMounted(() => {
       </div>
     </section>
     
-    <!-- Noleggi come acquirente -->
     <section v-if="vista === 'acquirente'">
       <h2>Noleggi in corso come acquirente</h2>
       <div v-if="loading">Caricamento in corso...</div>

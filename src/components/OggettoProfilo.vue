@@ -7,7 +7,6 @@ import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import api from '@/services/api'
 
-
 library.add(fasHeart, farHeart, faTag, faInfoCircle, faTimes);
 
 const props = defineProps({
@@ -25,25 +24,23 @@ const emit = defineEmits(['deleted']);
 const router = useRouter();
 const isFavorite = ref(false);
 const showAttributes = ref(false);
+const showDeleteConfirm = ref(false);
 
 const toggleFavorite = () => {
   isFavorite.value = !isFavorite.value;
 };
 
-const showDeleteConfirm = ref(false);
-
 const confirmDelete = async () => {
   try {
     await api.delete(`/api/oggetti/rimuovi/${props.productId}`);
-    emit('deleted', props.productId);  // Notifica al padre
+    emit('deleted', props.productId); 
     showDeleteConfirm.value = false;
   } catch (error) {
     console.error(error);
-    alert("Errore di rete durante l'eliminazione"); // opzionalmente sostituibile anche questo con un banner
+    alert("Errore di rete durante l'eliminazione"); 
     showDeleteConfirm.value = false;
   }
 };
-
 
 const formatPrice = (price) => {
   return new Intl.NumberFormat('it-IT', {
@@ -67,25 +64,10 @@ const goToDetails = () => {
     }
   });
 };
-
-const deleteObject = async () => {
-  if (confirm('Sei sicuro di voler eliminare questo oggetto?')) {
-    try {
-      const response = await api.delete(`/api/oggetti/rimuovi/${props.productId}`);
-      emit('deleted', props.productId);  // Notifica al padre
-
-    } catch (error) {
-      console.error(error);
-      alert('Errore di rete durante l\'eliminazione');
-    }
-  }
-};
 </script>
-
 
 <template>
   <div class="product-card">
-    <!-- Banner di conferma -->
     <div v-if="showDeleteConfirm" class="overlay">
       <div class="confirm-box">
         <p>Sei sicuro di voler eliminare questo oggetto?</p>
@@ -95,9 +77,8 @@ const deleteObject = async () => {
         </div>
       </div>
     </div>
-    
-    <!-- Pulsante X in alto a destra -->
-    <div class="delete-button" @click="confirmDelete  ">
+
+    <div class="delete-button" @click="showDeleteConfirm = true">
       <FontAwesomeIcon :icon="['fas', 'times']" />
     </div>
 
@@ -129,11 +110,10 @@ const deleteObject = async () => {
           <strong>{{ attr.nomeAttributo }}:</strong> {{ attr.valore }}
         </div>
       </div>
-
-   
     </div>
   </div>
 </template>
+
 
 
 <style scoped>

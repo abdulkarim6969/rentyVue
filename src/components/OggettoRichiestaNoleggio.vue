@@ -13,8 +13,6 @@ defineProps({
 
 const router = useRouter();
 
-
-
 </script>
 
 <template>

@@ -42,7 +42,6 @@ const disableBookedDates = (date) => {
   return bookedDates.value.has(formatted)
 }
 
-// Controlla se l'intervallo selezionato contiene date non disponibili
 const isRangeValid = computed(() => {
   if (!selectedRange.value || selectedRange.value.length < 2) return false
   
@@ -97,18 +96,17 @@ const rentItem = async () => {
 
   try {
     const payload = {
-      idNoleggio: null, // sarà generato dal backend se necessario
-      emailUtenteRichiedente: localStorage.getItem('email'), // Assicurati che l'email sia salvata nel localStorage
+      idNoleggio: null,
+      emailUtenteRichiedente: localStorage.getItem('email'), 
       codiceOggetto: parseInt(item.value.id),
       dataInizio: formatDateToYMD(start),
       dataFine: formatDateToYMD(end),
-      oggetto: null // opzionale se il backend lo ignora
+      oggetto: null
     }
 
     const response = await api.post('/api/noleggi/richieste', payload)
     
     alert('✅ Richiesta di noleggio inviata con successo!')
-    // Puoi anche fare un redirect o aggiornare la UI qui
   } catch (error) {
     console.error('Errore durante l\'invio della richiesta:', error)
     alert('❌ Errore durante l\'invio della richiesta di noleggio.')

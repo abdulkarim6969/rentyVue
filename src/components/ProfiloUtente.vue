@@ -19,13 +19,11 @@ onMounted(async () => {
   try {
     const email = localStorage.getItem('email');
     
-    // Effettua entrambe le chiamate in parallelo
     const [oggettiResponse, utenteResponse] = await Promise.all([
       api.get(`/api/oggetti/${email}`),
       api.get(`/api/utenti/${email}`)
     ]);
 
-    // Mappatura prodotti
     userProducts.value = oggettiResponse.data.map(oggetto => ({
       id: oggetto.id,
       title: oggetto.nome,
@@ -38,7 +36,6 @@ onMounted(async () => {
       updatedAt: oggetto.ultimaModifica
     }));
 
-    // Mappatura dati utente
     const userData = utenteResponse.data;
     user.value = {
       email: userData.email,
@@ -50,7 +47,7 @@ onMounted(async () => {
       citta: userData.citta,
       telefono: userData.telefono,
       dataNascita: new Date(userData.dataNascita).toLocaleDateString('it-IT'),
-      verified: ['Facebook', 'Google', 'E-mail'] // Manteniamo temporaneamente i mock
+      verified: ['Facebook', 'Google', 'E-mail'] 
     };
 
   } catch (err) {
@@ -116,7 +113,6 @@ onMounted(async () => {
   </div>
 </template>
 
-<!-- Aggiungi questi stili per le nuove informazioni -->
 <style scoped>
 .user-profile {
   max-width: 1200px;
@@ -124,7 +120,6 @@ onMounted(async () => {
   padding: 1rem;
 }
 
-/* Sezione profilo */
 .profile-header {
   margin-bottom: 2rem;
   padding: 1.5rem;
@@ -170,7 +165,6 @@ onMounted(async () => {
   margin: 0.2rem 0.2rem 0 0;
 }
 
-/* Sezione oggetti */
 .section-title {
   margin: 1.5rem 0 1rem;
   font-size: 1.2rem;
@@ -185,7 +179,6 @@ onMounted(async () => {
   padding: 0.5rem 0;
 }
 
-/* Mobile */
 @media (max-width: 768px) {
   .user-profile {
     padding: 0.5rem;
@@ -215,7 +208,6 @@ onMounted(async () => {
   }
 }
 
-/* Dettagli contatto compatti */
 .contact-details {
   display: flex;
   flex-wrap: wrap;
@@ -233,13 +225,11 @@ onMounted(async () => {
   font-size: 0.85rem;
 }
 
-/* Icone */
 .contact-item svg {
   width: 14px;
   height: 14px;
   opacity: 0.7;
 }
-
 
 .loading-spinner-container {
   display: flex;
@@ -251,13 +241,12 @@ onMounted(async () => {
 .spinner {
   width: 48px;
   height: 48px;
-  border: 6px solid #f3f3f3; /* colore sfondo */
-  border-top: 6px solid #007bff; /* colore attivo */
+  border: 6px solid #f3f3f3; 
+  border-top: 6px solid #007bff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
-/* Animazione rotazione */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

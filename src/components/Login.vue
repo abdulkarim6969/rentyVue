@@ -13,7 +13,7 @@ const handleLogin = async () => {
   error.value = ''
   try {
     await authStore.login({ email: email.value, password: password.value })
-    router.push('/home') // Vai alla home dopo il login
+    router.push('/home') 
   } catch (err) {
     error.value = 'Email o password non validi'
     console.error(err)
@@ -26,7 +26,7 @@ const handleLogin = async () => {
     <div class="login-box">
       <h1>Accedi al tuo Account</h1>
 
-      <!-- Error message -->
+
       <div v-if="error" class="error" role="alert">
         {{ error }}
       </div>
@@ -40,13 +40,11 @@ const handleLogin = async () => {
       <RouterLink to="/regi" class="divider">oppure Registrati
       </RouterLink>
 
-      <!-- @click="loginWithGoogle" -->
       <button  class="login-button google">
         <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" />
         Continue with Google
       </button>
 
-      <!-- @click="loginWithGithub" -->
       <button  class="login-button github">
         <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" />
         Continue with GitHub
