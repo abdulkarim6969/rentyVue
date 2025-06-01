@@ -256,4 +256,15 @@ section {
   margin-bottom: 2rem;
 }
 
+.view-buttons button.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #2980b9;
+}
+
+.view-buttons button:not(.active) {
+  color: black;
+}
+
+
 </style>

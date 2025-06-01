@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, reactive, watch, onMounted } from 'vue';
 import api from '@/services/api';
 import { useRouter } from 'vue-router';
 
@@ -9,6 +9,9 @@ const prezzoGiornaliero = ref(0);
 const nomeCategoria = ref('');
 const file = ref(null);
 const categorie = ref([]);
+
+const attributi = ref([]);
+const valoriAttributi = reactive({});
 
 const router = useRouter();
 
@@ -38,6 +41,30 @@ async function fetchCategorie() {
   }
 }
 
+async function fetchAttributiCategoria() {
+  if (!nomeCategoria.value) {
+    attributi.value = [];
+    // Pulisci reactive valoriAttributi
+    Object.keys(valoriAttributi).forEach(key => delete valoriAttributi[key]);
+    return;
+  }
+  try {
+    const response = await api.get(`/api/oggetti/attributiCategoria/${nomeCategoria.value}`);
+    attributi.value = response.data;
+
+    // Pulisci reactive valoriAttributi
+    Object.keys(valoriAttributi).forEach(key => delete valoriAttributi[key]);
+
+    // Inizializza chiavi reactive
+    attributi.value.forEach(attr => {
+      valoriAttributi[attr.nomeAttributo] = '';
+    });
+
+  } catch (error) {
+    showBanner('Errore nel caricamento degli attributi della categoria.', 'error');
+  }
+}
+
 async function submitForm() {
   try {
     const formData = new FormData();
@@ -46,7 +73,11 @@ async function submitForm() {
       descrizione: descrizione.value,
       prezzoGiornaliero: prezzoGiornaliero.value,
       emailProprietario: localStorage.getItem('email'),
-      nomeCategoria: nomeCategoria.value
+      nomeCategoria: nomeCategoria.value,
+      attributi: Object.entries(valoriAttributi).map(([nomeAttributo, valore]) => ({
+        nomeAttributo,
+        valore
+      }))
     };
 
     formData.append('file', file.value);
@@ -63,6 +94,7 @@ async function submitForm() {
     setTimeout(() => {
       router.push('/home');
     }, 1000);
+
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Errore nella creazione.';
     showBanner(errorMessage, 'error');
@@ -70,6 +102,10 @@ async function submitForm() {
 }
 
 onMounted(fetchCategorie);
+
+watch(nomeCategoria, () => {
+  fetchAttributiCategoria();
+});
 </script>
 
 <template>
@@ -101,6 +137,19 @@ onMounted(fetchCategorie);
         </select>
       </div>
 
+      <div v-if="attributi.length">
+        <div v-for="attr in attributi" :key="attr.id" class="attributo-categoria">
+          <label :for="attr.nomeAttributo"></label>
+          <input
+            type="text"
+            :id="attr.nomeAttributo"
+            v-model="valoriAttributi[attr.nomeAttributo]"
+            :placeholder="`Inserisci ${attr.nomeAttributo}`"
+            required
+          />
+        </div>
+      </div>
+
       <div class="file-upload-wrapper">
         <label for="file-upload" class="custom-file-upload">Scegli immagine</label>
         <input id="file-upload" type="file" @change="onFileChange" accept="image/*" />
@@ -111,6 +160,7 @@ onMounted(fetchCategorie);
     </form>
   </div>
 </template>
+
 
 <style scoped>
 .file-upload-wrapper {
@@ -143,6 +193,7 @@ input[type="file"] {
   font-size: 0.95rem;
   color: #555;
 }
+
 
 .form-wrapper {
   max-width: 600px;
@@ -229,4 +280,5 @@ input[type="file"] {
 .form-crea-oggetto button:hover {
   background-color: #2980b9;
 }
+
 </style>
